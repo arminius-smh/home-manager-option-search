@@ -1,14 +1,31 @@
-require 'open-uri'
 require 'nokogiri'
 require 'json'
 require 'pp'
 
+require 'selenium-webdriver'
+
 url = 'https://nix-community.github.io/home-manager/options.xhtml'
-html=""
-URI.open(url) do |f|
-  html = f.read
-end
-html.gsub!("\n","")
+
+# Specify the Selenium Docker container URL
+selenium_url = "http://localhost:4444"
+
+# Define options for the remote WebDriver
+options = Selenium::WebDriver::Chrome::Options.new
+
+# Use remote WebDriver with the Docker container URL and options
+driver = Selenium::WebDriver.for :remote, url: selenium_url, capabilities: options
+
+driver.get(url)
+
+# Wait for JavaScript to load (adjust the timeout as needed)
+wait = Selenium::WebDriver::Wait.new(timeout: 10)
+wait.until { driver.execute_script('return document.readyState') == 'complete' }
+
+# Get the HTML content after JavaScript has loaded
+html = driver.page_source
+
+# Close the browser
+driver.quit
 
 doc = Nokogiri::HTML(html)
 
@@ -65,11 +82,11 @@ data.search('dt').each do |dt|
         end
       elsif ch.text[0..7] == "Example:"
         example = ch.xpath("following-sibling::pre[1]")
-        if example.length > 0
-          option_example = example.text
-        else
-          option_example = ch.xpath("code").text
-        end
+        # if example.length > 0
+          option_example = example.inner_html
+        # else
+        #   option_example = ch.xpath("code").inner_html
+        # end
       end
     end
 
