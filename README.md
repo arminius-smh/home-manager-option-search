@@ -1,8 +1,16 @@
 # Nix Home Manager Option Search
 
-Find [home manager](https://github.com/nix-community/home-manager) options quickly.
+Find home manager options quickly.
 
 ![](images/homemanageroptionsearch.gif)
+
+## TODO
+
+### Next version
+
+- [ ] community repo
+- [ ] port to MUI.com
+- [ ] be aware of multiple home manager versions
 
 ## Contribute
 
