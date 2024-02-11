@@ -83,10 +83,19 @@ var updateOptionsTable = function(options) {
     att1.value = "optrow";
     tableRow.setAttributeNode(att1);
 
+    var att2 = document.createAttribute("tabindex");
+    att2.value = "0";
+    tableRow.setAttributeNode(att2);
 
-    var att2 = document.createAttribute("style");
-    att2.value = "overflow-wrap: break-word";
-    titleColumn.setAttributeNode(att2);
+    tableRow.onkeydown = function(e) {
+      if (e.keyCode == 13) {
+        tableRow.click();
+      };
+    };
+
+    var att3 = document.createAttribute("style");
+    att3.value = "overflow-wrap: break-word";
+    titleColumn.setAttributeNode(att3);
 
     tableRow.appendChild(titleColumn);
     tableRow.appendChild(descriptionColumn);
@@ -137,6 +146,49 @@ var setSearchQueryToUrlParam = function(query) {
 
 var searchOptions = function(query) {
   results = search.search(query);
+
+  // Performance optimization: skip ordering if query is a single character 
+  if (query.length > 1) {
+    // Split terms by non-alphanumeric chars
+    const terms = query.split(/[^A-Za-z0-9]/);
+
+    results.sort((a, b) => {
+      // Concatenate to sort first by occurence in title, then description.
+      const aConcat = a.title + a.description;
+      const bConcat = b.title + b.description;
+
+      // We store last found index, to order based on remaining string.
+      // This assumes that terms are written in the order that the user
+      // expects them to appear in the title + description.
+      var lastIndex = 0;
+
+      for (var i = 0; i < terms.length; i++) {
+        const term = terms[i];
+        const aIndex = aConcat.slice(lastIndex).indexOf(term);
+
+        // Not found in a, b must come first
+        if (aIndex == -1) return 1;
+
+        // No reason to index beyond result of lastIndex +aIndex + term.length,
+        // as a would come first in that case.
+        const bIndex = bConcat
+          .slice(lastIndex, lastIndex + aIndex + term.length)
+          .indexOf(term);
+
+        // Not found in b, a must come first
+        if (bIndex == -1) return -1;
+        if (aIndex !== bIndex) return aIndex - bIndex
+
+        // Increment lastIndex by found index and term length, to sort based 
+        // on remaining string.
+        lastIndex += aIndex + term.length;
+      }
+
+      // Default to alphabetical order otherwise 
+      return aConcat.localeCompare(bConcat);
+    });
+  }
+
   updateOptionCountAndTable();
 };
 
