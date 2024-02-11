@@ -2,8 +2,6 @@ with (import <nixpkgs> {});
 mkShell {
   buildInputs = [
     ruby_3_3
-    chromedriver
-    http-server
   ];
   shellHook = ''
     mkdir -p .nix-gems

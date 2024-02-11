@@ -105,12 +105,6 @@ var updateOptionsTable = function(options) {
   }
 };
 
-var formatExample = function(example) {
-    // var formattedExample = example.replace(/;|{|[[]|]/g, match => match === ']' ? '\n' + match : match + '\n');
-    // return formattedExample
-    return example;
-};
-
 var expandOption = function(el){
 
   modalTitle.innerHTML = currentSet[el].title;
@@ -119,7 +113,7 @@ var expandOption = function(el){
   var elType = "<h5 style='margin:1em 0 0 0'>Type</h5><div>" + currentSet[el].type + "</div>";
   var elNote = ( currentSet[el].note == "" ? "": "<h5 style='margin:1em 0 0 0'>Note</h5><div>" + currentSet[el].note + "</div>");
   var elDefault = "<h5 style='margin:1em 0 0 0'>Default</h5><div><pre style='margin-top:0.5em'>" + currentSet[el].default + "</pre></div>";
-  var elExample = ( currentSet[el].example == "" ? "" : "<h5 style='margin:1em 0 0 0'>Example</h5><div><pre style='margin-top:0.5em'>" + formatExample(currentSet[el].example) + "</pre></div>");
+  var elExample = ( currentSet[el].example == "" ? "" : "<h5 style='margin:1em 0 0 0'>Example</h5><div><pre style='margin-top:0.5em'>" + currentSet[el].example + "</pre></div>");
 
   var declared_by_str = currentSet[el].declared_by;
 
