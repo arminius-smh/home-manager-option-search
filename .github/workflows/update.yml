@@ -8,6 +8,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     name: parse options and create search
+    services:
+      selenium:
+        image: selenium/standalone-chrome:latest
+        options: --shm-size=2g
+        ports:
+          - 4444:4444
     steps:
 
       - uses: actions/checkout@v2

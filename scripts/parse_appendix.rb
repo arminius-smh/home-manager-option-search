@@ -1,14 +1,31 @@
-require 'open-uri'
 require 'nokogiri'
 require 'json'
 require 'pp'
 
+require 'selenium-webdriver'
 url = 'https://nix-community.github.io/home-manager/options.xhtml'
-html=""
-URI.open(url) do |f|
-  html = f.read
+
+begin
+  # Try to connect to docker instance
+  selenium_url = "http://localhost:4444"
+  options = Selenium::WebDriver::Chrome::Options.new
+
+  driver = Selenium::WebDriver.for :remote, url: selenium_url, options: options
+rescue Errno::ECONNREFUSED => e
+  # Fallback to locally installed chromedriver
+  options = Selenium::WebDriver::Chrome::Options.new
+  options.add_argument('--headless')
+  
+  driver = Selenium::WebDriver.for :chrome, options: options
 end
-html.gsub!("\n","")
+driver.get(url)
+
+wait = Selenium::WebDriver::Wait.new(timeout: 10)
+wait.until { driver.execute_script('return document.readyState') == 'complete' }
+
+html = driver.page_source
+
+driver.quit
 
 doc = Nokogiri::HTML(html)
 
@@ -65,11 +82,7 @@ data.search('dt').each do |dt|
         end
       elsif ch.text[0..7] == "Example:"
         example = ch.xpath("following-sibling::pre[1]")
-        if example.length > 0
-          option_example = example.text
-        else
-          option_example = ch.xpath("code").text
-        end
+          option_example = example.inner_html
       end
     end
 
