@@ -10,7 +10,7 @@ begin
   selenium_url = "http://localhost:4444"
   options = Selenium::WebDriver::Chrome::Options.new
 
-  driver = Selenium::WebDriver.for :remote, url: selenium_url, capabilities: options
+  driver = Selenium::WebDriver.for :remote, url: selenium_url, options: options
 rescue Errno::ECONNREFUSED => e
   # Fallback to locally installed chromedriver
   options = Selenium::WebDriver::Chrome::Options.new
